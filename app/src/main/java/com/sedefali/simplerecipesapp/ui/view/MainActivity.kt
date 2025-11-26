@@ -2,6 +2,7 @@ package com.sedefali.simplerecipesapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -11,7 +12,7 @@ import com.sedefali.simplerecipesapp.databinding.ActivityMainBinding
 import com.sedefali.simplerecipesapp.ui.adapter.RecipeAdapter
 import com.sedefali.simplerecipesapp.ui.view.AddRecipeActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecipeAdapter.OnRecipeActionListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var recipeAdapter: RecipeAdapter
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        recipeAdapter = RecipeAdapter(recipeList)
+        recipeAdapter = RecipeAdapter(recipeList, this)
         binding.recyclerViewRecipes.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = recipeAdapter
@@ -44,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         recipeList.add(Recipe(title = "Spaghetti", description = "Classic spaghetti with tomato sauce"))
         recipeAdapter.notifyDataSetChanged()
 
-        // FAB за добавяне на нова рецепта
         binding.fabAddRecipe.setOnClickListener {
             val intent = Intent(this, AddRecipeActivity::class.java)
             startActivityForResult(intent, ADD_RECIPE_REQUEST_CODE)
@@ -66,4 +66,16 @@ class MainActivity : AppCompatActivity() {
         recipeList.add(recipe)
         recipeAdapter.notifyItemInserted(recipeList.size - 1)
     }
+
+    // --- RecipeAdapter.OnRecipeActionListener ---
+    override fun onEdit(recipe: Recipe, position: Int) {
+        Toast.makeText(this, "Edit: ${recipe.title}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDelete(recipe: Recipe, position: Int) {
+        recipeList.removeAt(position)
+        recipeAdapter.notifyItemRemoved(position)
+        Toast.makeText(this, "Deleted: ${recipe.title}", Toast.LENGTH_SHORT).show()
+    }
 }
+
