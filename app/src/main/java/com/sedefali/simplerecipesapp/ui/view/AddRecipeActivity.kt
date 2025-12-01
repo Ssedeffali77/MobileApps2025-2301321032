@@ -25,7 +25,7 @@ class AddRecipeActivity : AppCompatActivity() {
             insets
         }
 
-        // Проверка дали това е Edit
+
         val titleFromIntent = intent.getStringExtra("recipe_title")
         val descriptionFromIntent = intent.getStringExtra("recipe_description")
         recipePosition = intent.getIntExtra("recipe_position", -1)
@@ -51,3 +51,4 @@ class AddRecipeActivity : AppCompatActivity() {
         }
     }
 }
+

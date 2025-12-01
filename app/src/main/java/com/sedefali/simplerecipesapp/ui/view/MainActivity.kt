@@ -20,7 +20,10 @@ class MainActivity : AppCompatActivity(), RecipeAdapter.OnRecipeActionListener {
 
     companion object {
         const val ADD_RECIPE_REQUEST_CODE = 100
+        const val EDIT_RECIPE_REQUEST_CODE = 101
     }
+
+    private var editingPosition: Int = -1 // пази позицията на рецептата при edit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +57,20 @@ class MainActivity : AppCompatActivity(), RecipeAdapter.OnRecipeActionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == ADD_RECIPE_REQUEST_CODE && resultCode == RESULT_OK) {
-            val title = data?.getStringExtra("recipe_title") ?: return
-            val description = data.getStringExtra("recipe_description") ?: return
+        if (resultCode != RESULT_OK || data == null) return
+
+        val title = data.getStringExtra("recipe_title") ?: return
+        val description = data.getStringExtra("recipe_description") ?: return
+
+        if (requestCode == ADD_RECIPE_REQUEST_CODE) {
             val newRecipe = Recipe(title = title, description = description)
             addRecipe(newRecipe)
+        } else if (requestCode == EDIT_RECIPE_REQUEST_CODE && editingPosition >= 0) {
+            val editedRecipe = recipeList[editingPosition].copy(title = title, description = description)
+            recipeList[editingPosition] = editedRecipe
+            recipeAdapter.notifyItemChanged(editingPosition)
+            editingPosition = -1
+            Toast.makeText(this, "Recipe updated", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -69,7 +81,12 @@ class MainActivity : AppCompatActivity(), RecipeAdapter.OnRecipeActionListener {
 
     // --- RecipeAdapter.OnRecipeActionListener ---
     override fun onEdit(recipe: Recipe, position: Int) {
-        Toast.makeText(this, "Edit: ${recipe.title}", Toast.LENGTH_SHORT).show()
+        editingPosition = position
+        val intent = Intent(this, AddRecipeActivity::class.java).apply {
+            putExtra("recipe_title", recipe.title)
+            putExtra("recipe_description", recipe.description)
+        }
+        startActivityForResult(intent, EDIT_RECIPE_REQUEST_CODE)
     }
 
     override fun onDelete(recipe: Recipe, position: Int) {
@@ -78,4 +95,5 @@ class MainActivity : AppCompatActivity(), RecipeAdapter.OnRecipeActionListener {
         Toast.makeText(this, "Deleted: ${recipe.title}", Toast.LENGTH_SHORT).show()
     }
 }
+
 
