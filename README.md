@@ -39,5 +39,5 @@ Build & Run on emulator or device
 
 ## APK
 Файлът на APK се намира в:
-[Свали APK](apk/my-release-key.apk)
+[Свали APK](app-release.apk)
 
